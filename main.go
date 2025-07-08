@@ -27,8 +27,7 @@ func main() {
 		},
 	}
 
-	_, err := ts.Up(context.Background())
-	if err != nil {
+	if _, err := ts.Up(context.Background()); err != nil {
 		logger.Stderr.Error("failed to connect server to tailscale", logger.ErrAttr(err))
 		os.Exit(1)
 	}
@@ -73,7 +72,7 @@ func main() {
 						logger.ErrAttr(err),
 					)
 
-					return
+					continue
 				}
 
 				go func() {
