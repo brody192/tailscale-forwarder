@@ -37,7 +37,7 @@ func init() {
 	sanitizedHostname := util.SanitizeString(Cfg.TSHostname)
 
 	if sanitizedHostname == "" {
-		errs = append(errs, fmt.Errorf("TS_HOSTNAME must be a valid hostname, before sanitization: %s, after sanitization: %s", Cfg.TSHostname, sanitizedHostname))
+		errs = append(errs, fmt.Errorf("TS_HOSTNAME must be a valid hostname, before sanitization: \"%s\", after sanitization: \"%s\"", Cfg.TSHostname, sanitizedHostname))
 	}
 
 	Cfg.TSHostname = sanitizedHostname
