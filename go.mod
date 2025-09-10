@@ -4,6 +4,7 @@ go 1.24.4
 
 require (
 	github.com/caarlos0/env/v10 v10.0.0
+	github.com/northbright/iocopy v1.16.2
 	golang.org/x/sync v0.15.0
 	tailscale.com v1.84.3
 )
