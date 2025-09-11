@@ -38,31 +38,33 @@ func fwdTCP(sourceConn net.Conn, targetAddr string, targetPort int) error {
 
 	g.Go(func() error {
 		defer cancel()
+
 		defer func() {
 			if tcpConn, ok := targetConn.(*net.TCPConn); ok {
 				tcpConn.CloseWrite()
 			}
 		}()
 
-		_, err := iocopy.Copy(ctx, targetConn, sourceConn)
-		if err != nil && !util.IsExpectedCopyError(err) {
+		if _, err := iocopy.Copy(ctx, targetConn, sourceConn); err != nil && !util.IsExpectedCopyError(err) {
 			return fmt.Errorf("failed to copy data to target: %w", err)
 		}
+
 		return nil
 	})
 
 	g.Go(func() error {
 		defer cancel()
+
 		defer func() {
 			if tcpConn, ok := sourceConn.(*net.TCPConn); ok {
 				tcpConn.CloseWrite()
 			}
 		}()
 
-		_, err := iocopy.Copy(ctx, sourceConn, targetConn)
-		if err != nil && !util.IsExpectedCopyError(err) {
+		if _, err := iocopy.Copy(ctx, sourceConn, targetConn); err != nil && !util.IsExpectedCopyError(err) {
 			return fmt.Errorf("failed to copy data from source: %w", err)
 		}
+
 		return nil
 	})
 
