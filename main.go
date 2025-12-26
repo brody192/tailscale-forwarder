@@ -20,8 +20,9 @@ func main() {
 	ts := &tsnet.Server{
 		Hostname:     config.Cfg.TSHostname,
 		AuthKey:      config.Cfg.TSAuthKey,
+		Dir:          config.Cfg.TSStateDir,
 		RunWebClient: false,
-		Ephemeral:    true,
+		Ephemeral:    config.Cfg.TSEphemeral,
 		UserLogf: func(format string, v ...any) {
 			logger.Stdout.Info(fmt.Sprintf(format, v...))
 		},
@@ -41,6 +42,8 @@ func main() {
 
 	logger.Stdout.Info("🚀 Starting tailscale_fwdr",
 		slog.String("ts-hostname", config.Cfg.TSHostname),
+		slog.String("ts-state-dir", config.Cfg.TSStateDir),
+		slog.Bool("ts-ephemeral", config.Cfg.TSEphemeral),
 		slog.Any("connection-mappings", config.Cfg.ConnectionMappings),
 	)
 
