@@ -42,11 +42,28 @@ This also solves for the issue that you can only run one Tailscale subnet router
 
 ## Configuration
 
-| Environment Variable     | Required | Default Value                                                                       | Description                                |
-| ------------------------ | :------: | ----------------------------------------------------------------------------------- | ------------------------------------------ |
-| `TS_AUTHKEY`             | Yes      | -                                                                                   | Tailscale auth key.                        |
-| `TS_HOSTNAME`            | Yes      | `${{RAILWAY_PROJECT_NAME}}-${{RAILWAY_ENVIRONMENT_NAME}}-${{RAILWAY_SERVICE_NAME}}` | Hostname to use for the Tailscale machine. |
-| `CONNECTION_MAPPING_[n]` | Yes      | -                                                                                   | Connection mapping for a service.          |
+| Environment Variable     | Required | Default Value                                                                       | Description                                                    |
+| ------------------------ | :------: | ----------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| `TS_AUTHKEY`             | Yes      | -                                                                                   | Tailscale auth key.                                            |
+| `TS_HOSTNAME`            | Yes      | `${{RAILWAY_PROJECT_NAME}}-${{RAILWAY_ENVIRONMENT_NAME}}-${{RAILWAY_SERVICE_NAME}}` | Hostname to use for the Tailscale machine.                     |
+| `CONNECTION_MAPPING_[n]` | Yes      | -                                                                                   | Connection mapping for a service.                              |
+| `TS_STATE_DIR`           | No       | -                                                                                   | Directory path for persisting Tailscale state across restarts. |
+| `TS_EPHEMERAL`           | No       | `true`                                                                              | Set to `false` to persist the node in your tailnet.            |
+
+### State Persistence
+
+By default, each container restart registers a new Tailscale machine (e.g., `myapp-1`, `myapp-2`). To maintain the same machine identity across restarts:
+
+1. Attach a persistent volume to your container (e.g., at `/var/lib/tailscale`)
+2. Set `TS_STATE_DIR` to the volume mount path
+3. Set `TS_EPHEMERAL=false`
+4. Use a non-ephemeral Tailscale auth key
+
+Example:
+```shell
+TS_STATE_DIR=/var/lib/tailscale
+TS_EPHEMERAL=false
+```
 
 ## Examples
 
