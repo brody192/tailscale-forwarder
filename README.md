@@ -24,7 +24,9 @@ This also solves for the issue that you can only run one Tailscale subnet router
 
    `CONNECTION_MAPPING_01=5432:${{Postgres.RAILWAY_PRIVATE_DOMAIN}}:${{Postgres.PGPORT}}`
 
-   The format is `<Source Port>:<Target Host>:<Target Port>`.
+   The format is `<Source Port>:<Target Host>:<Target Port>[:<Protocol>]`.
+
+   The optional fourth value sets protocol for that specific mapping (`HTTP` or `HTTPS`, default `HTTP`).
 
    Note: You can set multiple connection mappings by incrementing the `CONNECTION_MAPPING_` prefix.
 
@@ -46,9 +48,24 @@ This also solves for the issue that you can only run one Tailscale subnet router
 | ------------------------ | :------: | ----------------------------------------------------------------------------------- | -------------------------------------------------------------- |
 | `TS_AUTHKEY`             | Yes      | -                                                                                   | Tailscale auth key.                                            |
 | `TS_HOSTNAME`            | Yes      | `${{RAILWAY_PROJECT_NAME}}-${{RAILWAY_ENVIRONMENT_NAME}}-${{RAILWAY_SERVICE_NAME}}` | Hostname to use for the Tailscale machine.                     |
-| `CONNECTION_MAPPING_[n]` | Yes      | -                                                                                   | Connection mapping for a service.                              |
+| `CONNECTION_MAPPING_[n]` | Yes      | -                                                                                   | `<source>:<target_host>:<target>[:<protocol>]` per service mapping. |
 | `TS_STATE_DIR`           | No       | -                                                                                   | Directory path for persisting Tailscale state across restarts. |
 | `TS_EPHEMERAL`           | No       | `true`                                                                              | Set to `false` to persist the node in your tailnet.            |
+
+### HTTPS Support
+
+Set a specific mapping's optional 4th field to `HTTPS` to terminate TLS on the Tailscale side using certificates provisioned through Tailscale's local client certificate flow.
+
+Example:
+
+```shell
+CONNECTION_MAPPING_01=443:${{Web Server.RAILWAY_PRIVATE_DOMAIN}}:${{Web Server.PORT}}:HTTPS
+```
+
+Notes:
+- The protocol is per mapping (`HTTP` or `HTTPS`).
+- Clients must connect with TLS for mappings configured as `HTTPS`.
+- Your tailnet must have MagicDNS and HTTPS enabled.
 
 ### State Persistence
 
