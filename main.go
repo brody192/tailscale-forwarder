@@ -50,9 +50,13 @@ func main() {
 	wg := sync.WaitGroup{}
 
 	for _, mapping := range config.Cfg.ConnectionMappings {
-		listener, err := ts.Listen("tcp", fmt.Sprintf(":%d", mapping.SourcePort))
+		listener, listenMode, err := tailscaleListen(ts, mapping.SourcePort, mapping.Protocol)
 		if err != nil {
-			logger.Stderr.Error("failed to start local listener", slog.Int("source_port", mapping.SourcePort), logger.ErrAttr(err))
+			logger.Stderr.Error("failed to start local listener",
+				slog.Int("source_port", mapping.SourcePort),
+				slog.String("listen_mode", listenMode),
+				logger.ErrAttr(err),
+			)
 			os.Exit(1)
 		}
 
@@ -63,6 +67,8 @@ func main() {
 
 			logger.Stdout.Info("listening for connections",
 				slog.Int("source_port", mapping.SourcePort),
+				slog.String("listen_mode", listenMode),
+				slog.String("protocol", mapping.Protocol),
 				slog.String("target_addr", mapping.TargetAddr),
 				slog.Int("target_port", mapping.TargetPort),
 			)
@@ -97,4 +103,19 @@ func main() {
 	}
 
 	wg.Wait()
+}
+
+func tailscaleListen(ts *tsnet.Server, sourcePort int, protocol string) (net.Listener, string, error) {
+	addr := fmt.Sprintf(":%d", sourcePort)
+
+	switch protocol {
+	case config.ConnectionProtocolHTTPS:
+		ln, err := ts.ListenTLS("tcp", addr)
+		return ln, "https", err
+	case config.ConnectionProtocolHTTP:
+		ln, err := ts.Listen("tcp", addr)
+		return ln, "http", err
+	default:
+		return nil, protocol, fmt.Errorf("unsupported protocol: %s", protocol)
+	}
 }

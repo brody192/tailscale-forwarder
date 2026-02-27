@@ -1,9 +1,15 @@
 package config
 
+const (
+	ConnectionProtocolHTTP  = "HTTP"
+	ConnectionProtocolHTTPS = "HTTPS"
+)
+
 type connectionMapping struct {
 	SourcePort int
 	TargetAddr string
 	TargetPort int
+	Protocol   string
 }
 
 type config struct {

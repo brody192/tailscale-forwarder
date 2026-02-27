@@ -22,10 +22,10 @@ func parseConnectionMappingsFromEnv(prefix string) ([]connectionMapping, error) 
 			continue
 		}
 
-		parts := strings.SplitN(kv[1], ":", 3)
+		parts := strings.SplitN(kv[1], ":", 4)
 
-		if len(parts) != 3 {
-			return nil, fmt.Errorf("invalid connection mapping: %s", kv[1])
+		if len(parts) < 3 || len(parts) > 4 {
+			return nil, fmt.Errorf("invalid connection mapping: %s (expected <source_port>:<target_host>:<target_port>[:<protocol>])", kv[1])
 		}
 
 		sourcePort, err := strconv.Atoi(parts[0])
@@ -38,10 +38,19 @@ func parseConnectionMappingsFromEnv(prefix string) ([]connectionMapping, error) 
 			return nil, fmt.Errorf("invalid target port: %s", parts[2])
 		}
 
+		protocol := ConnectionProtocolHTTP
+		if len(parts) == 4 {
+			protocol = strings.ToUpper(strings.TrimSpace(parts[3]))
+			if protocol != ConnectionProtocolHTTP && protocol != ConnectionProtocolHTTPS {
+				return nil, fmt.Errorf("invalid protocol: %s (expected HTTP or HTTPS)", parts[3])
+			}
+		}
+
 		connectionMappings = append(connectionMappings, connectionMapping{
 			SourcePort: sourcePort,
 			TargetAddr: parts[1],
 			TargetPort: targetPort,
+			Protocol:   protocol,
 		})
 	}
 
