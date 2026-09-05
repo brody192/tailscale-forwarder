@@ -52,6 +52,24 @@ This also solves for the issue that you can only run one Tailscale subnet router
 | `TS_CONTROL_URL`         | No       | -                                                                                   | Control server URL (e.g. a self-hosted Headscale). Leave unset to use Tailscale's default control plane. |
 | `TS_STATE_DIR`           | No       | -                                                                                   | Directory path for persisting Tailscale state across restarts. |
 | `TS_EPHEMERAL`           | No       | `true`                                                                              | Set to `false` to persist the node in your tailnet.            |
+| `TS_ADVERTISE_TAGS`      | No       | -                                                                                   | Comma-separated tags for the node, e.g. `tag:railway`. Required when `TS_AUTHKEY` is an OAuth client secret. |
+
+### Using an OAuth client instead of an auth key
+
+Auth keys expire after 90 days at most. If the state directory is lost after that, the container cannot
+re-register. An [OAuth client](https://tailscale.com/kb/1215/oauth-clients) secret does not expire: tsnet
+exchanges it for a fresh auth key at registration time. Create the client with the `auth_keys` scope and
+one or more tags, then set:
+
+```shell
+TS_AUTHKEY=tskey-client-xxxxx?ephemeral=false&preauthorized=true
+TS_ADVERTISE_TAGS=tag:railway
+TS_EPHEMERAL=false
+```
+
+The tags must be listed in the OAuth client and in your tailnet policy (`tagOwners`). Tagged nodes have
+key expiry disabled automatically. To re-register an existing node with the OAuth secret, start it once
+with `TSNET_FORCE_LOGIN=1`.
 
 ### HTTPS Support
 

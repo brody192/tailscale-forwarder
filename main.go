@@ -24,6 +24,7 @@ func main() {
 		Dir:          config.Cfg.TSStateDir,
 		RunWebClient: false,
 		Ephemeral:    config.Cfg.TSEphemeral,
+		AdvertiseTags: config.Cfg.TSAdvertiseTags,
 		UserLogf: func(format string, v ...any) {
 			logger.Stdout.Info(fmt.Sprintf(format, v...))
 		},
@@ -46,6 +47,7 @@ func main() {
 		slog.String("ts-control-url", config.Cfg.TSControlURL),
 		slog.String("ts-state-dir", config.Cfg.TSStateDir),
 		slog.Bool("ts-ephemeral", config.Cfg.TSEphemeral),
+		slog.Any("ts-advertise-tags", config.Cfg.TSAdvertiseTags),
 		slog.Any("connection-mappings", config.Cfg.ConnectionMappings),
 	)
 
