@@ -53,6 +53,16 @@ This also solves for the issue that you can only run one Tailscale subnet router
 | `TS_STATE_DIR`           | No       | -                                                                                   | Directory path for persisting Tailscale state across restarts. |
 | `TS_EPHEMERAL`           | No       | `true`                                                                              | Set to `false` to persist the node in your tailnet.            |
 
+### Custom Start Commands
+
+The container includes `/bin/sh` and runs `/usr/local/bin/tailscale_fwdr` directly through `ENTRYPOINT`. To open a shell with Docker, override the entrypoint:
+
+```shell
+docker run --rm -it --entrypoint /bin/sh ghcr.io/brody192/tailscale-forwarder:latest
+```
+
+Use `exec` when starting the forwarder from a shell so it receives container signals directly.
+
 ### HTTPS Support
 
 Prefix the mapping with `https:` to terminate TLS on the Tailscale side using certificates provisioned through Tailscale's local client certificate flow.
