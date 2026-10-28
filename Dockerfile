@@ -8,9 +8,11 @@ RUN go mod download
 
 COPY . ./
 
-RUN CGO_ENABLED=0 go build -o tailscale_fwdr -ldflags="-w -s" ./.
+RUN CGO_ENABLED=0 go build -o tailscale_fwdr -ldflags="-w -s" ./cmd/tailscale-forwarder
 
-FROM gcr.io/distroless/static
+FROM busybox:musl
+
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 
 COPY --from=builder /app/tailscale_fwdr /usr/local/bin/tailscale_fwdr
 
